@@ -1,0 +1,13 @@
+<?php
+define('FONTS_STORAGE', '/PATH/TO/YOUR/FONTS');
+define('INSTALL_TARGET', '/PATH/TO/YOUR/ANIME STORAGE');
+
+define('DRY_RUN', false);
+
+define('IGNORED_FONTS', [
+    '等线',
+    '黑体',
+    // 'Fairy gone OP', // <- this is embeeded in ass file
+    // Create your own list...
+]);
+define('USE_RELATIVE_LINK', true);

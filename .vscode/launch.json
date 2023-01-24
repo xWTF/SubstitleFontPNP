@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "Install Fonts",
+            "type": "php",
+            "request": "launch",
+            "program": "${workspaceFolder}/install.php",
+            "cwd": "${workspaceFolder}",
+            "port": 0,
+            "runtimeArgs": [
+                "-dxdebug.start_with_request=yes"
+            ],
+            "env": {
+                "XDEBUG_MODE": "debug,develop",
+                "XDEBUG_CONFIG": "client_port=${port}"
+            }
+        },
+        {
+            "name": "Build Index",
+            "program": "./",
+            "cwd": "${workspaceFolder}/build_index/",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        }
+    ]
+}

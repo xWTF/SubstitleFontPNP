@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.php.example": "php",
+        "*.js.example": "javascript"
+    }
+}
