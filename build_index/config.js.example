@@ -1,3 +1,1 @@
-export default {
-    FONTS_STORAGE: '/PATH/TO/YOUR/FONTS',
-};
+export const FONTS_STORAGE = 'PATH/TO/YOUR/FONTS';
