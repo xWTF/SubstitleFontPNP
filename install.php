@@ -48,7 +48,7 @@ $missing = [];
 $install_tasks = [];
 
 chdir(INSTALL_TARGET);
-foreach (glob('**/*.ass') as $file) {
+foreach (glob('{,*/,*/*/,*/*/*/,*/*/*/*/}*.ass', GLOB_BRACE) as $file) {
     echo ('Parsing subtitle: ' . $file . PHP_EOL);
     $data = file_get_contents($file);
 
@@ -182,7 +182,7 @@ if (DRY_RUN) {
             unlink($target);
         }
 
-        echo (' Installeding ' . $target . ' => ' . $source . '...  ');
+        echo (' Installing ' . $target . ' => ' . $source . '...  ');
         if (!symlink_fix($source, $target)) {
             echo ('Failed' . PHP_EOL);
         } else {
@@ -197,4 +197,4 @@ file_put_contents(__DIR__ . '/missing.txt', implode("\n", $keys));
 file_put_contents(__DIR__ . '/missing.json', json_encode($missing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
 echo ('Install complete, missing fonts: ' . count($missing) . PHP_EOL);
-die(implode(PHP_EOL, array_map(fn ($v) => "\t" . $v, array_keys($missing))));
+echo (implode(PHP_EOL, array_map(fn ($v) => "\t" . $v, array_keys($missing))) . PHP_EOL);
