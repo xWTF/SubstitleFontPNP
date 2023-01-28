@@ -36,6 +36,10 @@ function defaultLocale(names, testKey = 'fontFamily') {
     return l;
 }
 
+function cleanupText(data) {
+    return data.trim().replace(/[\t\n\r\/\\:*<>"\|]/g, ' ');
+}
+
 function processFont(data, force) {
     const font = parseFont(data.buffer), names = font.names;
     if (!names.fontFamily) {
@@ -49,11 +53,11 @@ function processFont(data, force) {
             return '';
         }
         if (names[key][locale]) {
-            return names[key][locale].trim();
+            return cleanupText(names[key][locale]);
         }
         const fallback = Object.keys(names[key])[0];
         console.warn(`\tUnable to read ${key}.${locale}, fallback to ${fallback}`);
-        return names[key][fallback].trim();
+        return cleanupText(names[key][fallback]);
     };
 
     let storage = join(FONTS_STORAGE, lattr('fontFamily'));
