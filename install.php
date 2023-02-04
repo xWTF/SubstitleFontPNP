@@ -1,6 +1,13 @@
 <?php
 require_once('config.php');
 
+$_INSTALL_TARGET = realpath($argv[1] ?? INSTALL_TARGET_DEFAULT);
+echo ('Install Target: ' . $_INSTALL_TARGET . PHP_EOL);
+
+if (!is_dir($_INSTALL_TARGET)) {
+    die('Target is not a directory!');
+}
+
 function fix_path($path, $replace = DIRECTORY_SEPARATOR)
 {
     return str_replace(['/', '\\'], $replace, $path);
@@ -47,7 +54,7 @@ $_INDEX = json_decode(file_get_contents(FONTS_STORAGE . DIRECTORY_SEPARATOR . 'i
 $missing = [];
 $install_tasks = [];
 
-chdir(INSTALL_TARGET);
+chdir($_INSTALL_TARGET);
 foreach (glob('{,*/,*/*/,*/*/*/,*/*/*/*/}*.ass', GLOB_BRACE) as $file) {
     echo ('Parsing subtitle: ' . $file . PHP_EOL);
     $data = file_get_contents($file);
