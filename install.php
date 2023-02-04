@@ -81,27 +81,15 @@ foreach (glob('{,*/,*/*/,*/*/*/,*/*/*/*/}*.ass', GLOB_BRACE) as $file) {
         }
     }
 
-    // Strip out useless data
-    $data = explode('[Events]', $data);
-    if (count($data) != 2) {
-        var_dump($data);
-        die('	bad ass file: no events');
+    // Find styles sections
+    if (!preg_match_all('/\[V4\+ Styles\]\s*\n([^[]+)\n\[/im', str_replace("\r", "\n", $data), $v4_styles)) {
+        die('	bad ass file: V4+ styles not found');
     }
-    $data = explode('[Fonts]', $data[0]);
-    if (count($data) == 2) {
-        preg_match_all('/fontname:\s*(.+)/', $data[1], $embeeded);
-        echo ('	Embeeded fonts found, be careful: ' . implode(', ', $embeeded[1]) . PHP_EOL);
-    }
-    $data = explode('[V4+ Styles]', $data[0]);
-    if (count($data) != 2) {
-        var_dump($data);
-        die('	bad ass file: no styles');
-    }
-    $data = str_replace("\r", "\n", $data[1]);
+    $v4_styles = implode("\n", $v4_styles[1]);
 
     // Parse fonts
     $fonts = [];
-    foreach (explode("\n", $data) as $line) {
+    foreach (explode("\n", $v4_styles) as $line) {
         $line = trim($line);
         if ($line == '' || $line[0] == ';') {
             continue;
