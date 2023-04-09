@@ -127,6 +127,9 @@ foreach (glob('{,*/,*/*/,*/*/*/,*/*/*/*/}*.ass', GLOB_BRACE) as $file) {
             continue;
         }
         $storage = $_INDEX[$name];
+        if (isset($storage['X-PNP-IGNORED']) && $storage['X-PNP-IGNORED']) {
+            continue;
+        }
 
         $font = null;
         if (!$font && $bold && $italic) {
