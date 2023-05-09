@@ -115,7 +115,7 @@ foreach ($ass_files as $file) {
         if (str_starts_with($line, 'Style: ')) {
             $data = explode(',', $line);
             $fonts[] = [trim($data[1], " \t\n\r\0\x0B@"), boolval($data[7]), boolval($data[8])];
-        } else if (!str_starts_with($line, 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic')) {
+        } else if (!str_starts_with(strtolower(str_replace(' ', '', $line)), 'format:name,fontname,fontsize,primarycolour,secondarycolour,outlinecolour,backcolour,bold,italic')) {
             die('	bad format or line: ' . $line);
         }
     }
