@@ -7,6 +7,9 @@ echo ('Install Target: ' . $_INSTALL_TARGET . PHP_EOL);
 if (!is_dir($_INSTALL_TARGET)) {
     die('Target is not a directory!');
 }
+if (!chdir($_INSTALL_TARGET)) {
+    die('Unable to change directory!');
+}
 
 function fix_path($path, $replace = DIRECTORY_SEPARATOR)
 {
@@ -49,13 +52,28 @@ function readlink_fix($link)
     return readlink($link);
 }
 
+function list_ass($dir, &$result)
+{
+    $fd = opendir($dir);
+    while ($file = readdir($fd)) {
+        if ($file === '.' || $file === '..') {
+            continue;
+        }
+        if (is_dir($file)) {
+            list_ass($dir . DIRECTORY_SEPARATOR . $file, $result);
+        } else if (str_ends_with(strtolower($file), '.ass')) {
+            $result[] = $dir . DIRECTORY_SEPARATOR . $file;
+        }
+    }
+}
+
 $_INDEX = json_decode(file_get_contents(FONTS_STORAGE . DIRECTORY_SEPARATOR . 'index.json'), true);
 
 $missing = [];
 $install_tasks = [];
 
-chdir($_INSTALL_TARGET);
-foreach (glob('{,*/,*/*/,*/*/*/,*/*/*/*/}*.ass', GLOB_BRACE) as $file) {
+list_ass('.', $ass_files);
+foreach ($ass_files as $file) {
     echo ('Parsing subtitle: ' . $file . PHP_EOL);
     $data = file_get_contents($file);
 
