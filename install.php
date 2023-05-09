@@ -32,10 +32,27 @@ function relative_path($p1, $p2)
     return str_repeat('..' . DIRECTORY_SEPARATOR, count($p2) - 1) . implode(DIRECTORY_SEPARATOR, $p1);
 }
 
+function exec_fix($command, &$result_code = 0)
+{
+    $process = proc_open($command, [
+        1 => ['pipe', 'w'],
+        2 => ['file', 'php://stderr', 'w'],
+    ], $pipes);
+    if (!is_resource($process)) {
+        return null;
+    }
+
+    $stdout = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+
+    $result_code = proc_close($process);
+    return trim($stdout);
+}
+
 function symlink_fix($target, $link)
 {
     if (PHP_OS_FAMILY === 'Windows') {
-        exec('mklink "' . fix_path($link) . '" "' . fix_path($target) . '"', result_code: $code);
+        exec_fix('mklink "' . fix_path($link) . '" "' . fix_path($target) . '"', result_code: $code);
         return $code == 0;
     }
     return symlink($target, $link);
@@ -44,7 +61,7 @@ function symlink_fix($target, $link)
 function readlink_fix($link)
 {
     if (PHP_OS_FAMILY === 'Windows') {
-        if (preg_match('/\[([^]]+)\]$/', exec('dir "' . fix_path($link) . '"|find "<SYMLINK>"'), $link) === false) {
+        if (preg_match('/\[([^]]+)\]$/', exec_fix('dir "' . fix_path($link) . '"|findstr "<SYMLINK>"'), $link) === false) {
             return null;
         }
         return $link[1];
