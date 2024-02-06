@@ -149,7 +149,9 @@ foreach ($ass_files as $file) {
     foreach ($_BOM_MAPPING as $bom => $e) {
         if (str_starts_with($data, $bom)) {
             $encoding = $e;
-            $data = substr($data, strlen($bom));
+            do {
+                $data = substr($data, strlen($bom));
+            } while (str_starts_with($data, $bom));
 
             if ($e !== 'UTF-8') {
                 $data = mb_convert_encoding($data, 'UTF-8', $e);
