@@ -203,11 +203,10 @@ foreach ($ass_files as $file) {
             continue;
         }
 
-        if (!in_array($current_section, ['[v4 styles]', '[v4+ styles]', '[events]', '[fonts]'])) {
+        if (!in_array($current_section, ['[v4 styles]', '[v4+ styles]', '[events]'])) {
             continue;
         }
 
-        $l1 = $line;
         $line = explode(':', $line, 2);
         if (count($line) !== 2) {
             die('	malformed file: unrecognized line');
@@ -291,9 +290,6 @@ foreach ($ass_files as $file) {
                         $fonts[] = $style;
                     }
                 }
-                break;
-            case '[fonts]':
-                // TODO: we can't parse the font file yet
                 break;
         }
     }
