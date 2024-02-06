@@ -84,6 +84,40 @@ function list_ass($dir, &$result)
     }
 }
 
+function find_font($name, $bold, $italic, $fallback = true)
+{
+    global $_INDEX, $_INDEX_FALLBACK;
+
+    $idx = $fallback ? $_INDEX : $_INDEX_FALLBACK;
+    if (!isset($idx[$name])) {
+        return $fallback ? find_font(strtolower($name), $bold, $italic, false) : null;
+    }
+    $storage = $idx[$name];
+
+    if (isset($storage['X-PNP-IGNORED']) && $storage['X-PNP-IGNORED']) {
+        return false;
+    }
+
+    $font = null;
+    if (!$font && $bold && $italic) {
+        $font = $storage['Bold Italic'] ?? $storage['Italic Bold'] ?? null;
+    }
+    if (!$font && $bold) {
+        $font = $storage['Bold'] ?? $storage['Heavy'] ?? null;
+    }
+    if (!$font && $italic) {
+        $font = $storage['Italic'] ?? $storage['Bold Italic'] ?? null;
+    }
+    if (!$font) {
+        $font = $storage['Regular'] ?? $storage['Normal'] ?? null;
+    }
+    if (!$font) {
+        $font = reset($storage);
+        echo ('	No font matched! fallback: ' . $font . PHP_EOL);
+    }
+    return $font;
+}
+
 $_BOM_MAPPING = [
     "\xEF\xBB\xBF" => 'UTF-8',
     "\xFE\xFF" => 'UTF-16BE',
@@ -96,6 +130,10 @@ $_BOM_MAPPING = [
 ];
 
 $_INDEX = json_decode(file_get_contents(FONTS_STORAGE . DIRECTORY_SEPARATOR . 'index.json'), true);
+$_INDEX_FALLBACK = [];
+foreach ($_INDEX as $k => $v) {
+    $_INDEX_FALLBACK[strtolower($k)] = $v;
+}
 
 $missing = [];
 $install_tasks = [];
@@ -276,7 +314,11 @@ foreach ($ass_files as $file) {
 
     // Prepare for installation tasks
     foreach ($fonts as [$name, $bold, $italic]) {
-        if (!isset($_INDEX[$name])) {
+        $font = find_font($name, $bold, $italic);
+        if ($font === false) {
+            continue;
+        }
+        if (!$font) {
             $k = $name . ' -- ' . ($bold ? 'B' : '_') . ($italic ? 'I' : '_');
             if (isset($missing[$k])) {
                 $missing[$k][] = $file;
@@ -284,28 +326,6 @@ foreach ($ass_files as $file) {
                 $missing[$k] = [$file];
             }
             continue;
-        }
-        $storage = $_INDEX[$name];
-        if (isset($storage['X-PNP-IGNORED']) && $storage['X-PNP-IGNORED']) {
-            continue;
-        }
-
-        $font = null;
-        if (!$font && $bold && $italic) {
-            $font = $storage['Bold Italic'] ?? $storage['Italic Bold'] ?? null;
-        }
-        if (!$font && $bold) {
-            $font = $storage['Bold'] ?? $storage['Heavy'] ?? null;
-        }
-        if (!$font && $italic) {
-            $font = $storage['Italic'] ?? $storage['Bold Italic'] ?? null;
-        }
-        if (!$font) {
-            $font = $storage['Regular'] ?? $storage['Normal'] ?? null;
-        }
-        if (!$font) {
-            $font = reset($storage);
-            echo ('	No font matched! fallback: ' . $font . PHP_EOL);
         }
 
         $source = realpath(FONTS_STORAGE . DIRECTORY_SEPARATOR . $font);
