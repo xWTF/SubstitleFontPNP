@@ -128,6 +128,7 @@ $_BOM_MAPPING = [
     "\xF7\x64\x4C" => 'UTF-1',
     "\x84\x31\x95\x33" => 'GB18030',
 ];
+$_IGNORED_FONTS = array_map('strtolower', IGNORED_FONTS);
 
 $_INDEX = json_decode(file_get_contents(FONTS_STORAGE . DIRECTORY_SEPARATOR . 'index.json'), true);
 $_INDEX_FALLBACK = [];
@@ -302,7 +303,7 @@ foreach ($ass_files as $file) {
     if (count($fonts) == 0) {
         die('	no fonts defined!');
     }
-    $fonts = array_filter($fonts, fn ($v) => !in_array($v[0], IGNORED_FONTS));
+    $fonts = array_filter($fonts, fn ($v) => !in_array($v[0], $_IGNORED_FONTS));
     if (count($fonts) == 0) {
         continue;
     }
